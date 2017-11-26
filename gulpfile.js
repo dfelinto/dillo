@@ -2,6 +2,7 @@ var argv         = require('minimist')(process.argv.slice(2));
 var autoprefixer = require('gulp-autoprefixer');
 var cache        = require('gulp-cached');
 var concat       = require('gulp-concat');
+var dest         = require('gulp-dest');
 var gulp         = require('gulp');
 var gulpif       = require('gulp-if');
 var pug          = require('gulp-pug');
@@ -36,13 +37,23 @@ gulp.task('styles', function() {
 
 /* Templates - Pug */
 gulp.task('templates', function() {
-    gulp.src('src/templates/**/*.pug')
+    gulp.src('src/templates/**/*.pug', !'src/templates/**/feeds/*.pug')
         .pipe(gulpif(enabled.failCheck, plumber()))
         .pipe(cache('templating'))
         .pipe(pug({
             pretty: enabled.prettyPug
         }))
         .pipe(gulp.dest('dillo/templates/'))
+        .pipe(gulpif(argv.livereload, livereload()));
+
+    gulp.src('src/templates/dillo/feeds/*.pug')
+        .pipe(gulpif(enabled.failCheck, plumber()))
+        .pipe(cache('feeding'))
+        .pipe(pug({
+            pretty: enabled.prettyPug
+        }))
+        .pipe(dest('dillo/templates/dillo/feeds', {ext: '.xml'}))
+        .pipe(gulp.dest('.'))
         .pipe(gulpif(argv.livereload, livereload()));
 });
 
