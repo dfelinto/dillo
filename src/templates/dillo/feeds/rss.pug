@@ -5,8 +5,9 @@ rss( version="2.0", xmlns:content="http://purl.org/rss/1.0/modules/content/", xm
         description {{ project.description }}
         link {{ url_for('posts.index', community_url=project.url, _external=True) }}
 
-        //each feed, i in myFeeds
-        //    item
-        //        title= feed.title
-        //        guid( isPermaLink="true" )= feed.id
-        //        updated= feed.date.toUTCString()
+        | {% for post in posts['_items'] %}
+        item
+            title {{ post.name }}
+            guid( isPermaLink="true" ) {{ post._id }}
+            updated = {{ post._updated }}
+        | {% endfor %}

@@ -34,6 +34,10 @@ def common_feed(community_url: str, feed_url: str):
     api = system_util.pillar_api()
 
     project = Project.find_first({'where': {'url': community_url}}, api=api)
+    posts = Node.all({
+        'where': {'project': project['_id'], 'node_type': 'dillo_post', 'properties.status': 'published'},
+        'sort': '-_created',
+    }, api=api)
 
     if project is None:
         return abort(404)
@@ -41,6 +45,7 @@ def common_feed(community_url: str, feed_url: str):
     return render_template(
         feed_url,
         project=project,
+        posts=posts,
     )
 
 
